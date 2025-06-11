@@ -14,8 +14,12 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('fullName')->after('name');
             $table->string('userName')->unique()->after('fullName');
-            $table->string('companyName')->after('userName');
-            $table->string('phoneNumber')->after('companyName');
+            $table->string('userLogo')->nullable()->after('userName');
+            $table->string('userLogoPath')->nullable()->after('userLogo');
+            $table->string('companyName')->after('userLogoPath');
+            $table->string('companyLogo')->nullable()->after('companyName');
+            $table->string('companyLogoPath')->nullable()->after('companyLogo');
+            $table->string('phoneNumber')->after('companyLogoPath');
             $table->string('role')->default('user')->after('phoneNumber');
             $table->text('comments')->nullable()->after('role');
         });
@@ -30,7 +34,11 @@ return new class extends Migration
             $table->dropColumn([
                 'fullName',
                 'userName',
+                'userLogo',
+                'userLogoPath',
                 'companyName',
+                'companyLogo',
+                'companyLogoPath',
                 'phoneNumber',
                 'role',
                 'comments'

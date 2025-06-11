@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 
 class User extends Authenticatable implements JWTSubject
@@ -25,7 +24,11 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'fullName',
         'userName',
+        'userLogo',
+        'userLogoPath',
         'companyName',
+        'companyLogo',
+        'companyLogoPath',
         'phoneNumber',
         'role',
         'comments'

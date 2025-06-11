@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
@@ -40,6 +41,8 @@ class AuthController extends Controller
             'role' => 'required|string|in:admin,user',
             'comments' => 'nullable|string',
             'password_confirmation' => 'required|string|min:8|max:16',
+            'userLogo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'companyLogo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
             'email.unique' => 'User Already Registered!',
             'password.confirmed' => 'Check your password',
@@ -63,7 +66,7 @@ class AuthController extends Controller
             return response()->json($errors, 422);
         }
 
-        $user = User::create([
+        $userData = [
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'fullName' => $request->fullName,
@@ -72,8 +75,27 @@ class AuthController extends Controller
             'phoneNumber' => $request->phoneNumber,
             'role' => $request->role,
             'comments' => $request->comments
-        ]);
+        ];
 
+        // Handle user logo upload
+        if ($request->hasFile('userLogo')) {
+            $userLogo = $request->file('userLogo');
+            $userLogoName = time() . '_user_logo.' . $userLogo->getClientOriginalExtension();
+            $userLogoPath = $userLogo->storeAs('logos/users', $userLogoName, 'public');
+            $userData['userLogo'] = $userLogoName;
+            $userData['userLogoPath'] = $userLogoPath;
+        }
+
+        // Handle company logo upload
+        if ($request->hasFile('companyLogo')) {
+            $companyLogo = $request->file('companyLogo');
+            $companyLogoName = time() . '_company_logo.' . $companyLogo->getClientOriginalExtension();
+            $companyLogoPath = $companyLogo->storeAs('logos/companies', $companyLogoName, 'public');
+            $userData['companyLogo'] = $companyLogoName;
+            $userData['companyLogoPath'] = $companyLogoPath;
+        }
+
+        $user = User::create($userData);
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
